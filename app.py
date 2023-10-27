@@ -14,15 +14,14 @@ app.config["SECRET_KEY"] = "secret"
 hashids = Hashids(min_length=6, salt=app.config["SECRET_KEY"])
 
 
-@app.route("/", methods=["GET"])
+@app.route("/", methods=("GET",))
 def index():
     return render_template("./index.html")
 
 
-@app.route("/", methods=["POST"])
+@app.route("/", methods=("POST",))
 def shorten_url():
     url = request.form["url"]
-    print("here", url)
     if not url:
         flash("Please enter a valid URL", "error")
         return redirect(url_for("index"))
@@ -34,3 +33,25 @@ def shorten_url():
     hashid = hashids.encode(url_id)
     Short_Url = request.host_url + hashid
     return render_template("./index.html", short_url=Short_Url)
+
+
+@app.route("/<short_url>", methods=("GET",))
+def get_original_link(short_url):
+    conn = get_db_conn()
+    original_id = hashids.decode(short_url)
+    if not original_id:
+        flash("Invalid URL", "error")
+        return redirect(url_for("index"))
+    original_id = original_id[0]
+    url_data = conn.execute(
+        "SELECT original_url, clicks FROM urls WHERE id=(?)", (original_id,)
+    ).fetchone()
+    if not url_data:
+        flash("Invalid URL", "error")
+        return redirect(url_for("index"))
+    short_url = url_data["original_url"]
+    clicks = url_data["clicks"]
+    conn.execute("UPDATE urls SET clicks=? where id=?", (clicks + 1, original_id))
+    conn.commit()
+    conn.close()
+    return redirect(short_url)
