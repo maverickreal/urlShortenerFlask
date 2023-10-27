@@ -76,5 +76,15 @@ def get_url_stats(short_url):
     Created = url_data["created"]
     conn.close()
     return render_template(
-        "stats.html", clicks=Clicks, created=Created, original_url=Original_url
+        "url_info.html", clicks=Clicks, created=Created, original_url=Original_url
     )
+
+
+@app.route("/stats", methods=("GET",))
+def get_all_url_stats():
+    conn = get_db_conn()
+    Url_data = conn.execute("SELECT original_url, clicks, created FROM urls").fetchall()
+    if Url_data:
+        return render_template("stats.html", url_data=Url_data)
+    flash("Invalid URL", "error")
+    return redirect(url_for("index"))

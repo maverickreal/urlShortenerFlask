@@ -1,9 +1,24 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>{% block title %} Flask Url Shortener Statistics for <big>{{original_url}}</big> {% endblock %}</h1>
-<hr><br>
-<p>clicks: <b>{{ clicks }}</b></p>
-<p>time of creation: <b>{{ created }}</b></p>
+<h1>{% block title %} Flask Url Shortener Statistics {% endblock %}</h1>
+<table class="table">
+    <thead>
+        <tr style="border:dashed; border-color: blueviolet; background-color: yellow;">
+            <th scope="col">Original</th>
+            <th scope="col">Clicks</th>
+            <th scope="col">Creation Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for url in url_data %}
+        <tr>
+            <td>{{ url['original_url'] }}</td>
+            <td>{{ url['clicks'] }}</td>
+            <td>{{ url['created'] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 {% endblock %}
