@@ -1,4 +1,5 @@
 import sqlite3
+import os
 from hashids import Hashids
 from flask import Flask, render_template, request, flash, redirect, url_for
 
@@ -106,3 +107,7 @@ def search():
         return render_template("stats.html", url_data=Url_data)
     flash("Invalid Search", "error")
     return redirect(url_for("index"))
+
+if __name__ == "__main__":
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=True, host='0.0.0.0', port=port)
