@@ -55,3 +55,26 @@ def get_original_link(short_url):
     conn.commit()
     conn.close()
     return redirect(short_url)
+
+
+@app.route("/<short_url>/stats", methods=("GET",))
+def get_url_stats(short_url):
+    conn = get_db_conn()
+    original_id = hashids.decode(short_url)
+    if not original_id:
+        flash("Invalid URL", "error")
+        return redirect(url_for("index"))
+    original_id = original_id[0]
+    url_data = conn.execute(
+        "SELECT original_url, clicks, created FROM urls WHERE id=(?)", (original_id,)
+    ).fetchone()
+    if not url_data:
+        flash("Invalid URL", "error")
+        return redirect(url_for("index"))
+    Clicks = url_data["clicks"]
+    Original_url = url_data["original_url"]
+    Created = url_data["created"]
+    conn.close()
+    return render_template(
+        "stats.html", clicks=Clicks, created=Created, original_url=Original_url
+    )

@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{% block title %} Flask Url Shortener Statistics for <big>{{original_url}}</big> {% endblock %}</h1>
+<hr><br>
+<p>clicks: <b>{{ clicks }}</b></p>
+<p>time of creation: <b>{{ created }}</b></p>
+
+{% endblock %}
