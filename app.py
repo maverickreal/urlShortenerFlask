@@ -88,3 +88,21 @@ def get_all_url_stats():
         return render_template("stats.html", url_data=Url_data)
     flash("Invalid URL", "error")
     return redirect(url_for("index"))
+
+
+@app.route("/search", methods=("GET",))
+def search():
+    conn = get_db_conn()
+    search_term = request.args.get("search-item")
+    if not search_term:
+        flash("Invalid Search", "error")
+        return redirect(url_for("index"))
+    search_term = "%" + search_term + "%"
+    Url_data = conn.execute(
+        "SELECT original_url, clicks, created FROM urls WHERE original_url LIKE (?)",
+        (search_term,),
+    ).fetchall()
+    if Url_data:
+        return render_template("stats.html", url_data=Url_data)
+    flash("Invalid Search", "error")
+    return redirect(url_for("index"))
